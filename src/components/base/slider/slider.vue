@@ -84,7 +84,7 @@ export default {
         height: 8px;
         border-radius: 50%;
         background: $color-text-l;
-        .active{
+        &.active{
           width:20px;
           border-radius: 5px;
           background: $color-text-ll;
