@@ -1,4 +1,5 @@
 <template>
+<!-- components文件是与业务逻辑无关的组件 -->
   <div class="header">
     <span class="icon"></span>
     <h1 class="text">Chicken Music</h1>
