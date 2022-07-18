@@ -70,7 +70,8 @@ export default {
         width:100%;
       }
     }
-    .dots-wrapper{
+  }
+  .dots-wrapper{
       position:absolute;
       left: 50%;
       bottom: 12px;
@@ -90,6 +91,5 @@ export default {
         }
       }
     }
-  }
 }
 </style>
