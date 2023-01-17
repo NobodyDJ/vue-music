@@ -1,15 +1,15 @@
 <template>
- <div class="tab">
+    <div class="tab">
     <!-- router-link相当于a标签，但是它可以不重新加载页面的情况下跳转至指定的路径to属性指定了路径 -->
-    <router-link
-     class="tab-item"
-     v-for="tab in tabs"
-     :key="tab.path"
-     :to="tab.path"
-    >
-     <span class="tab-link">{{tab.name}}</span>
-    </router-link>
- </div>
+        <router-link
+            class="tab-item"
+            v-for="tab in tabs"
+            :key="tab.path"
+            :to="tab.path"
+        >
+            <span class="tab-link">{{tab.name}}</span>
+        </router-link>
+    </div>
 </template>
 
 <script>

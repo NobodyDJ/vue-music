@@ -1,3 +1,4 @@
+// 单文件原则（SFC）
 import BScroll from '@better-scroll/core'
 import Slide from '@better-scroll/slide'
 
@@ -8,10 +9,11 @@ BScroll.use(Slide)
 export default function useSlider(wrapperRef) {
     const slider = ref(null) // 初始值为null，变成可响应式的
     const currentPageIndex = ref(0) // 初始值为0
+    let sliderVal = slider.value
 
-    // onMounted相关的vue3知识点 composition API 7.17看一下
+    // onMounted相关的vue3知识点 composition API 7.17看一下 组合式API获取生命周期函数
     onMounted(() => {
-        const sliderVal = slider.value = new BScroll(wrapperRef.value, {
+        sliderVal = new BScroll(wrapperRef.value, {
             click: true,
             scrollX: true,
             scrollY: false,
@@ -26,7 +28,7 @@ export default function useSlider(wrapperRef) {
         })
     })
     onUnmounted(() => {
-        slider.value.destroy()
+        sliderVal.destroy()
     })
     return {
         slider,

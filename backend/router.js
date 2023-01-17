@@ -155,6 +155,7 @@ function registerRecommend(app) {
       data
     }).then((response) => {
       const data = response.data
+      // coe等于0，是成功的情况
       if (data.code === ERR_OK) {
         // 处理轮播图数据
         const focusList = data.focus.data.shelf.v_niche[0].v_card

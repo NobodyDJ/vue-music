@@ -5,26 +5,54 @@
         <slider v-if="sliders.length" :sliders="sliders"></slider>
       </div>
     </div>
+    <div class="recommend-list">
+      <h1 class="list-title" v-show="!loading">热门歌单推荐</h1>
+      <ul>
+        <li
+          v-for="item in albums"
+          class="item"
+          :key="item.id"
+          @click="selectItem(item)"
+        >
+          <div class="icon">
+            <img width="60" height="60" :src="item.pic">
+          </div>
+          <div class="text">
+            <h2 class="name">
+              {{ item.username }}
+            </h2>
+            <p class="title">
+              {{item.title}}
+            </p>
+          </div>
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
 
 <script>
 import { getRecommend } from '@/service/recommend'
 import Slider from '@/components/base/slider/slider'
-
 export default {
   name: 'mRecommend',
   components: { Slider },
   data() {
     return {
-      sliders: []
+      sliders: [],
+      albums: []
     }
   },
   // 生命周期函数也可以声明为一个异步函数
   async created() {
-    const result = await getRecommend()
-    this.sliders = result.sliders
-    console.log(result)
+    try {
+      const result = await getRecommend()
+      this.sliders = result.sliders
+      this.albums = result.albums
+      console.log(result)
+    } catch (error) {
+      this.$message.error(error)
+    }
   }
 }
 </script>
@@ -48,6 +76,44 @@ export default {
       top: 0;
       width: 100%;
       height: 100%;
+    }
+  }
+  .recommend-list {
+    .list-title {
+      height: 65px;
+      line-height: 65px;
+      text-align: center;
+      font-size: $font-size-medium;
+      color: $color-theme;
+    }
+    .item {
+      display: flex;
+      box-sizing: border-box;
+      align-items: center;
+      padding: 0 20px 20px 20px;
+
+      .icon {
+        // flex-grow 0如果存在剩余空间也不放大 flex-shrink 0空间不足时也不会缩小 flex-basis 与width设置一样的空间是保证该项目大小固定不变
+        flex: 0 0 60px;
+        width: 60px;
+        padding-right: 20px;
+      }
+      .text {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        flex: 1;
+        line-height: 20px;
+        overflow: hidden;
+        font-size: $font-size-medium;
+      }
+      .name {
+        margin-bottom: 10px;
+        color: $color-text;
+      }
+      .title {
+        color: $color-text-d;
+      }
     }
   }
 }

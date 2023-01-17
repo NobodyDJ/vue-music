@@ -1,4 +1,6 @@
+// 哈希模式
 import { createRouter, createWebHashHistory } from 'vue-router'
+// 引入组件采用首字母大写的形式
 import Recommend from '@/views/recommend'
 import Singer from '@/views/singer'
 import TopList from '@/views/top-list'

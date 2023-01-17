@@ -36,8 +36,11 @@ export default {
       }
     }
   },
+  // setup()函数是一个专门用于组合式API的特殊钩子，在生命周期中该函数是最先被执行的
+  // setup()函数可以接受两个参数一个参数是props即当前组件实例下的props，第二个参数是context执行上下文
+  // 这里是使用compositionAPI主要将与第三方库交互的逻辑剥离出去，结构清晰
   setup() {
-    // 引用rootRef该dom变成响应式？获取dom节点，对这个dom节点进行了轮播图切换的效果
+    // 如下相当于声明了一个响应式变量,ref(null)相当于获取最外层容器的节点，想获取子元素节点可以使用children
     const rootRef = ref(null)
     const { currentPageIndex } = useSlider(rootRef)
     return {
@@ -87,7 +90,7 @@ export default {
         &.active{
           width:20px;
           border-radius: 5px;
-          background: $color-text-ll;
+          background: $color-text-ll; // 在vue.config.js中设置了全局css变量
         }
       }
     }

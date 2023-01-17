@@ -1,12 +1,12 @@
-// 对axios进行封装
+// 封装axios，保证axios已经安装
 import axios from 'axios'
 
 const ERR_OK = 0
-const baseURL = '/'
+const baseUrl = '/'
 
-axios.defaults.baseURL = baseURL
+axios.defaults.baseURL = baseUrl
 
-// axios进行封装的一个函数
+// 对get方法进行封装,每个接口返回的数据格式是不一样的
 export function get(url, params) {
     return axios.get(url, {
         params
@@ -15,7 +15,7 @@ export function get(url, params) {
         if (serverData.code === ERR_OK) {
             return serverData.result
         }
-    }).catch((e) => {
-        console.log(e)
+    }).catch((err) => {
+        return err
     })
 }
