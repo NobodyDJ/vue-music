@@ -8,6 +8,7 @@ import 'element-plus/dist/index.css'
 import '@/assets/scss/index.scss'
 import VueLazyload from 'vue-lazyload'
 import loadingDirective from './components/loading/directive'
+import noResultDirective from './components/base/no-result/directive'
 
 const app = createApp(App)
 // 图片懒加载的效果
@@ -21,4 +22,5 @@ app
         loading: loadImage
     })
     .directive('loading', loadingDirective)
+    .directive('noResult', noResultDirective)
     .mount('#app')

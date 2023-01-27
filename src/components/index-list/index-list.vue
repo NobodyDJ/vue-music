@@ -68,7 +68,7 @@ export default {
       }
     }
   },
-  emits: ['onItemClick'],
+  emits: ['select'],
   // 第二个参数接受的context上下文
   setup(props, { emit }) {
     const { groupRef, fixedTitle, fixedStyle, currentIndex, onScroll } = useFixed(props)
@@ -128,7 +128,7 @@ export default {
   }
   .fixed {
     position: absolute;
-    top: 0;
+    top: -1px;
     left: 0;
     width: 100%;
     .fixed-title {

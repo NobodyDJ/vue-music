@@ -1,7 +1,7 @@
 <template>
  <m-header></m-header>
  <m-tab></m-tab>
- <!-- 承载了对应的路由视图 -->
+ <!-- 承载了对应的路由组件 -->
  <router-view></router-view>
 </template>
 
