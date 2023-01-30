@@ -12,14 +12,14 @@ const mutations = {
     setPlayMode(state, playMode) {
         state.playMode = playMode
     },
-    setPlayState(state, playSate) {
-        state.playSate = playSate
-    },
     setCurrentIndex(state, currentIndex) {
         state.currentIndex = currentIndex
     },
     setFullScreen(state, fullScreen) {
         state.fullScreen = fullScreen
+    },
+    setFavoriteList(state, favoriteList) {
+        state.favoriteList = favoriteList
     }
 }
 export default mutations

@@ -3,14 +3,17 @@
  <m-tab></m-tab>
  <!-- 承载了对应的路由组件 -->
  <router-view></router-view>
+ <!-- 一个全局的播放器 -->
+ <player></player>
 </template>
 
 <script>
 import mHeader from '@/components/header/header.vue'
 import mTab from '@/components/tab/tab.vue'
+import player from '@/components/player/player.vue'
 
 export default {
-  components: { mHeader, mTab }
+  components: { mHeader, mTab, player }
 }
 </script>
 

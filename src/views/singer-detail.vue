@@ -34,7 +34,6 @@ export default {
     },
     watch: {
         $route() {
-            console.log(this.$route)
             if (this.$route.params.id) {
                 this.$nextTick(() => {
                     this.getSongs()
@@ -47,8 +46,6 @@ export default {
         computedSinger() {
             const singer = this.singer
             let result = null
-            console.log('singer', singer)
-            console.log(Object.keys(singer))
             if (Object.keys(singer).length !== 0) {
                 result = singer
             } else {

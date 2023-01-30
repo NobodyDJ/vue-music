@@ -36,7 +36,6 @@ export default {
     selectSinger(singer) {
       this.selectedSinger = singer
       this.cacheSinger(singer)
-      console.log('singer', singer)
       this.$router.push({ path: `/singer/${singer.mid}` })
     },
     cacheSinger(singer) {

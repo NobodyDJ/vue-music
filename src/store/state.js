@@ -13,7 +13,9 @@ const state = {
     // 当前播放歌曲
     currentIndex: 0,
     // 全屏还是小屏
-    fullScreen: false
+    fullScreen: false,
+    // 收藏列表
+    favoriteList: []
 }
 
 export default state

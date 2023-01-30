@@ -2,9 +2,9 @@
   <!-- 这里运用到了一个动态指令的规则 -->
   <div class="recommend" v-loading:[loadingText]="loading">
     <!-- 注意betterScroll只对第一个子元素生效 -->
-    <scroll class="recommend-content" :click="true">
+    <scroll class="recommend-content">
       <div>
-      <div class="slider-wrapper">
+        <div class="slider-wrapper">
         <div class="slider-content">
           <slider v-if="sliders.length" :sliders="sliders"></slider>
         </div>
@@ -16,7 +16,6 @@
               v-for="item in albums"
               class="item"
               :key="item.id"
-              @click="selectItem(item)"
             >
               <div class="icon">
                 <img width="60" height="60" v-lazy="item.pic">
@@ -71,7 +70,7 @@ export default {
 
 <style lang="scss" scoped>
 .recommend {
-  // position: fixed;
+  position: fixed;
   width: 100%;
   top: 88px;
   bottom: 0;
