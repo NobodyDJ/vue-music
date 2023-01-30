@@ -1,4 +1,5 @@
-import { PLAY_MODE } from '@/assets/js/constant'
+import { PLAY_MODE, FAVORITE_KEY } from '@/assets/js/constant'
+import { load } from '@/assets/js/array-store'
 
 // 原始数据
 const state = {
@@ -15,7 +16,7 @@ const state = {
     // 全屏还是小屏
     fullScreen: false,
     // 收藏列表
-    favoriteList: []
+    favoriteList: load(FAVORITE_KEY)
 }
 
 export default state

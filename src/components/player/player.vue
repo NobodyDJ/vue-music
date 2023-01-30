@@ -35,7 +35,7 @@
               <i class="icon-next" @click="next"></i>
             </div>
             <div class="icon i-right">
-              <i class="icon-not-favorite"></i>
+              <i :class="getFavoriteIcon(currentSong)" @click="toggleFavorite(currentSong)"></i>
             </div>
           </div>
         </div>
@@ -51,6 +51,7 @@
 import { computed, watch, ref } from 'vue'
 import { useStore } from 'vuex'
 import useMode from './use-mode'
+import useFavorite from './use-favorite'
 export default {
   name: 'player',
   // 这里放得都是播放器的相关逻辑
@@ -62,6 +63,7 @@ export default {
     const songReady = ref(false)
     // hooks
     const { modeIcon, changeMode } = useMode()
+    const { getFavoriteIcon, toggleFavorite } = useFavorite()
     // computed
     const fullScreen = computed(() => { return store.state.fullScreen })
     const currentSong = computed(() => { return store.getters.currentSong })
@@ -164,7 +166,6 @@ export default {
       audioRef,
       playIcon,
       disableCls,
-      modeIcon,
       goBack,
       togglePlay,
       pause,
@@ -172,7 +173,12 @@ export default {
       next,
       ready,
       error,
-      changeMode
+      // mode
+      modeIcon,
+      changeMode,
+      // favorite
+      getFavoriteIcon,
+      toggleFavorite
     }
   }
 }
