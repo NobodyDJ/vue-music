@@ -21,6 +21,16 @@
           <h2 class="subtitle">{{currentSong.singer}}</h2>
         </div>
         <div class="bottom">
+          <div class="progress-wrapper">
+            <span class="time time-l">{{currentTime}}</span>
+            <div class="progress-bar-wrapper">
+              <progress-bar
+                ref="barRef"
+                :progress="progress"
+              ></progress-bar>
+            </div>
+            <span class="time time-r">{{currentSong.duration}}</span>
+          </div>
           <div class="operators">
             <div class="icon i-left">
               <i :class="modeIcon" @click="changeMode"></i>
@@ -43,17 +53,20 @@
     <audio ref="audioRef"
      @pause="pause"
      @canplay="ready"
-     @error="error"></audio>
+     @error="error"
+     @timeupdate="updateTime"></audio>
   </div>
 </template>
 
 <script>
 import { computed, watch, ref } from 'vue'
 import { useStore } from 'vuex'
+import { ProgressBar } from './progress-bar.vue'
 import useMode from './use-mode'
 import useFavorite from './use-favorite'
 export default {
   name: 'player',
+  components: { ProgressBar },
   // 这里放得都是播放器的相关逻辑
   setup(props) {
     // 注意代码的分类规范
@@ -61,6 +74,7 @@ export default {
     const store = useStore()
     const audioRef = ref(null)
     const songReady = ref(false)
+    const currentTime = ref(0)
     // hooks
     const { modeIcon, changeMode } = useMode()
     const { getFavoriteIcon, toggleFavorite } = useFavorite()
@@ -74,6 +88,7 @@ export default {
     const currentIndex = computed(() => { return store.state.currentIndex })
     const playList = computed(() => { return store.state.playList })
     const disableCls = computed(() => { return songReady.value ? '' : 'disable' })
+    // const progress = computed(() => )
     // watch
     watch(currentSong, (newVal) => {
       if (!newVal.id && !newVal.url) {
@@ -160,6 +175,10 @@ export default {
     function error() {
       songReady.value = true
     }
+    // 歌曲当前更新时间触发该方法
+    function updateTime(e) {
+      currentTime.value = e.target.currentTime
+    }
     return {
       fullScreen,
       currentSong,
@@ -173,6 +192,7 @@ export default {
       next,
       ready,
       error,
+      updateTime,
       // mode
       modeIcon,
       changeMode,
@@ -344,29 +364,29 @@ export default {
       //     }
       //   }
       // }
-      // .progress-wrapper {
-      //   display: flex;
-      //   align-items: center;
-      //   width: 80%;
-      //   margin: 0px auto;
-      //   padding: 10px 0;
-      //   .time {
-      //     color: $color-text;
-      //     font-size: $font-size-small;
-      //     flex: 0 0 40px;
-      //     line-height: 30px;
-      //     width: 40px;
-      //     &.time-l {
-      //       text-align: left;
-      //     }
-      //     &.time-r {
-      //       text-align: right;
-      //     }
-      //   }
-      //   .progress-bar-wrapper {
-      //     flex: 1;
-      //   }
-      // }
+      .progress-wrapper {
+        display: flex;
+        align-items: center;
+        width: 80%;
+        margin: 0px auto;
+        padding: 10px 0;
+        .time {
+          color: $color-text;
+          font-size: $font-size-small;
+          flex: 0 0 40px;
+          line-height: 30px;
+          width: 40px;
+          &.time-l {
+            text-align: left;
+          }
+          &.time-r {
+            text-align: right;
+          }
+        }
+        .progress-bar-wrapper {
+          flex: 1;
+        }
+      }
       .operators {
         display: flex;
         align-items: center;

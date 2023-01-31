@@ -24,7 +24,7 @@ export default function useShortcut(props, groupRef) {
         scrollTo(anchorIndex)
     }
     function scrollTo(anchorIndex) {
-        // 添加一场处理，因为用户点击的区域可能为父级dom元素，而不是anchor内部的li会出现获取不到dataset这个属性，从而导致报错
+        // 添加异常处理，因为用户点击的区域可能为父级dom元素，而不是anchor内部的li会出现获取不到dataset这个属性，从而导致报错
         if (Number.isNaN(anchorIndex)) {
             return
         }

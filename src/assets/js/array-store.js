@@ -40,6 +40,6 @@ export function remove(key, compare) {
 
 // 加载初始化数据
 export function load(key) {
-    const list = JSON.parse(localStorage.getItem(key))
+    const list = JSON.parse(localStorage.getItem(key)) || []
     return list
 }
