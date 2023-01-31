@@ -5,9 +5,11 @@
     <div class="bar-inner">
       <div
         class="progress"
+        :style="progressStyle"
       ></div>
       <div
         class="progress-btn-wrapper"
+        :style="btnStyle"
       >
         <div class="progress-btn"></div>
       </div>
@@ -16,25 +18,40 @@
 </template>
 
 <script>
-  export default {
-    name: 'progress-bar',
-    props: {
-        progress: {
-            type: Number,
-            default: 0
-        }
+// 这里的按钮大小是定死的
+const progressBtnWidth = 16
+export default {
+  name: 'progress-bar',
+  props: {
+    progress: {
+      type: Number,
+      default: 0
+    }
+  },
+  data() {
+    return {
+      offset: 0
+    }
+  },
+  computed: {
+    progressStyle() {
+      return {
+        width: `${this.offset}px`
+      }
     },
-    data() {
-        return {
-            offset: 0
-        }
-    },
-    watch: {
-        progress(newVal) {
-            console.log(newVal)
-        }
+    btnStyle() {
+      return {
+        transform: `translate3d(${this.offset}px, 0, 0)`
+      }
+    }
+  },
+  watch: {
+    progress(newVal) {
+      const barWidth = this.$el.clientWidth - progressBtnWidth
+      this.offset = barWidth * newVal
     }
   }
+}
 </script>
 
 <style lang="scss" scoped>

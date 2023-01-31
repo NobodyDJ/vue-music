@@ -22,14 +22,14 @@
         </div>
         <div class="bottom">
           <div class="progress-wrapper">
-            <span class="time time-l">{{currentTime}}</span>
+            <span class="time time-l">{{formatTime(currentTime)}}</span>
             <div class="progress-bar-wrapper">
               <progress-bar
                 ref="barRef"
                 :progress="progress"
               ></progress-bar>
             </div>
-            <span class="time time-r">{{currentSong.duration}}</span>
+            <span class="time time-r">{{formatTime(currentSong.duration)}}</span>
           </div>
           <div class="operators">
             <div class="icon i-left">
@@ -61,7 +61,8 @@
 <script>
 import { computed, watch, ref } from 'vue'
 import { useStore } from 'vuex'
-import { ProgressBar } from './progress-bar.vue'
+import { formatTime } from '@/assets/js/util'
+import ProgressBar from './progress-bar'
 import useMode from './use-mode'
 import useFavorite from './use-favorite'
 export default {
@@ -88,7 +89,7 @@ export default {
     const currentIndex = computed(() => { return store.state.currentIndex })
     const playList = computed(() => { return store.state.playList })
     const disableCls = computed(() => { return songReady.value ? '' : 'disable' })
-    // const progress = computed(() => )
+    const progress = computed(() => { return currentTime.value / currentSong.value.duration })
     // watch
     watch(currentSong, (newVal) => {
       if (!newVal.id && !newVal.url) {
@@ -185,6 +186,8 @@ export default {
       audioRef,
       playIcon,
       disableCls,
+      progress,
+      currentTime,
       goBack,
       togglePlay,
       pause,
@@ -193,6 +196,7 @@ export default {
       ready,
       error,
       updateTime,
+      formatTime,
       // mode
       modeIcon,
       changeMode,
