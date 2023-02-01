@@ -27,6 +27,8 @@
               <progress-bar
                 ref="barRef"
                 :progress="progress"
+                @progress-changing="onProgressChanging"
+                @progress-changed="onProgressChanged"
               ></progress-bar>
             </div>
             <span class="time time-r">{{formatTime(currentSong.duration)}}</span>
@@ -54,7 +56,8 @@
      @pause="pause"
      @canplay="ready"
      @error="error"
-     @timeupdate="updateTime"></audio>
+     @timeupdate="updateTime"
+     @ended="end"></audio>
   </div>
 </template>
 
@@ -62,6 +65,7 @@
 import { computed, watch, ref } from 'vue'
 import { useStore } from 'vuex'
 import { formatTime } from '@/assets/js/util'
+import { PLAY_MODE } from '@/assets/js/constant'
 import ProgressBar from './progress-bar'
 import useMode from './use-mode'
 import useFavorite from './use-favorite'
@@ -76,6 +80,8 @@ export default {
     const audioRef = ref(null)
     const songReady = ref(false)
     const currentTime = ref(0)
+    // 当进度条发生变化时，优先拖动改变事件大于播放器获取实时事件
+    let progressChanging = false
     // hooks
     const { modeIcon, changeMode } = useMode()
     const { getFavoriteIcon, toggleFavorite } = useFavorite()
@@ -83,6 +89,7 @@ export default {
     const fullScreen = computed(() => { return store.state.fullScreen })
     const currentSong = computed(() => { return store.getters.currentSong })
     const playing = computed(() => { return store.state.playing })
+    const playMode = computed(() => { return store.state.playMode })
     const playIcon = computed(() => {
       return playing.value ? 'icon-play' : 'icon-pause'
     })
@@ -118,6 +125,7 @@ export default {
       store.commit('setPlayingState', !playing.value)
     }
     // 这里的pause方法是当电脑处于待机状态下，歌曲会暂停，保证vueX中的状态实时更新
+    // 当歌曲播放结束时，歌曲会自动暂停
     function pause() {
       store.commit('setPlayingState', false)
     }
@@ -125,6 +133,7 @@ export default {
       const audioEl = audioRef.value
       audioEl.currentTime = 0
       audioEl.play()
+      store.commit('setPlayingState', true)
     }
     function prev() {
       let index = currentIndex.value - 1
@@ -176,18 +185,39 @@ export default {
     function error() {
       songReady.value = true
     }
+    function end() {
+      if (playMode.value === PLAY_MODE.loop) {
+        loop()
+      } else {
+        next()
+      }
+    }
     // 歌曲当前更新时间触发该方法
     function updateTime(e) {
-      currentTime.value = e.target.currentTime
+      if (!progressChanging) {
+        currentTime.value = e.target.currentTime
+      }
     }
+    // 注意 这里的上下两个方法发生了冲突，导致拖动进度条的时候会来回跳跃。
+    function onProgressChanging(progress) {
+      progressChanging = true
+      currentTime.value = progress * currentSong.value.duration
+    }
+    function onProgressChanged(progress) {
+      progressChanging = false
+      audioRef.value.currentTime = currentTime.value = progress * currentSong.value.duration
+      // 注意要根据计算好的响应式数据来判断，注意规范
+      if (!playing.value) {
+        store.commit('setPlayingState', true)
+      }
+    }
+
     return {
       fullScreen,
       currentSong,
       audioRef,
       playIcon,
       disableCls,
-      progress,
-      currentTime,
       goBack,
       togglePlay,
       pause,
@@ -195,14 +225,20 @@ export default {
       next,
       ready,
       error,
-      updateTime,
+      end,
       formatTime,
       // mode
       modeIcon,
       changeMode,
       // favorite
       getFavoriteIcon,
-      toggleFavorite
+      toggleFavorite,
+      // progress
+      progress,
+      currentTime,
+      updateTime,
+      onProgressChanging,
+      onProgressChanged
     }
   }
 }
