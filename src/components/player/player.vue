@@ -20,6 +20,46 @@
           <h1 class="title">{{currentSong.name}}</h1>
           <h2 class="subtitle">{{currentSong.singer}}</h2>
         </div>
+        <div
+          class="middle"
+        >
+          <div
+            class="middle-l"
+          >
+            <div
+              ref="cdWrapperRef"
+              class="cd-wrapper"
+            >
+              <div
+                ref="cdRef"
+                class="cd"
+              >
+                <img
+                  ref="cdImageRef"
+                  class="image"
+                  :class="cdCls"
+                  :src="currentSong.pic">
+              </div>
+            </div>
+          </div>
+          <scroll
+            class="middle-r"
+            ref="lyricScrollRef"
+          >
+            <div class="lyric-wrapper">
+              <div v-if="currentLyric" ref="lyricListRef">
+                <p
+                  class="text"
+                  :class="{'current': currentLineNum === index}"
+                  v-for="(line,index) in currentLyric.lines"
+                  :key="line.num"
+                >
+                  {{line.txt}}
+                </p>
+              </div>
+            </div>
+          </scroll>
+        </div>
         <div class="bottom">
           <div class="progress-wrapper">
             <span class="time time-l">{{formatTime(currentTime)}}</span>
@@ -67,11 +107,14 @@ import { useStore } from 'vuex'
 import { formatTime } from '@/assets/js/util'
 import { PLAY_MODE } from '@/assets/js/constant'
 import ProgressBar from './progress-bar'
+import Scroll from '@/components/base/scroll/scroll.vue'
 import useMode from './use-mode'
 import useFavorite from './use-favorite'
+import useCd from './use-cd'
+import useLyric from './use-lyric'
 export default {
   name: 'player',
-  components: { ProgressBar },
+  components: { ProgressBar, Scroll },
   // 这里放得都是播放器的相关逻辑
   setup(props) {
     // 注意代码的分类规范
@@ -85,6 +128,8 @@ export default {
     // hooks
     const { modeIcon, changeMode } = useMode()
     const { getFavoriteIcon, toggleFavorite } = useFavorite()
+    const { cdRef, cdImageRef, cdCls } = useCd()
+    const { currentLyric, currentLineNum, lyricScrollRef, lyricListRef, playLyric, stopLyric } = useLyric(songReady, currentTime)
     // computed
     const fullScreen = computed(() => { return store.state.fullScreen })
     const currentSong = computed(() => { return store.getters.currentSong })
@@ -115,7 +160,13 @@ export default {
         return
       }
       const audioEl = audioRef.value
-      newVal ? audioEl.play() : audioEl.pause()
+      if (newVal) {
+        audioEl.play()
+        playLyric()
+      } else {
+        audioEl.pause()
+        stopLyric()
+      }
     })
     // methods
     function goBack() {
@@ -181,6 +232,7 @@ export default {
         return
       }
       songReady.value = true
+      playLyric()
     }
     function error() {
       songReady.value = true
@@ -202,6 +254,8 @@ export default {
     function onProgressChanging(progress) {
       progressChanging = true
       currentTime.value = progress * currentSong.value.duration
+      stopLyric()
+      playLyric()
     }
     function onProgressChanged(progress) {
       progressChanging = false
@@ -210,6 +264,7 @@ export default {
       if (!playing.value) {
         store.commit('setPlayingState', true)
       }
+      playLyric()
     }
 
     return {
@@ -238,7 +293,16 @@ export default {
       currentTime,
       updateTime,
       onProgressChanging,
-      onProgressChanged
+      onProgressChanged,
+      // cd
+      cdRef,
+      cdImageRef,
+      cdCls,
+      // lyric
+      currentLyric,
+      currentLineNum,
+      lyricScrollRef,
+      lyricListRef
     }
   }
 }
@@ -301,87 +365,88 @@ export default {
         color: $color-text;
       }
     }
-  //   .middle {
-  //     position: fixed;
-  //     width: 100%;
-  //     top: 80px;
-  //     bottom: 170px;
-  //     white-space: nowrap;
-  //     font-size: 0;
-  //     .middle-l {
-  //       display: inline-block;
-  //       vertical-align: top;
-  //       position: relative;
-  //       width: 100%;
-  //       height: 0;
-  //       padding-top: 80%;
-  //       .cd-wrapper {
-  //         position: absolute;
-  //         left: 10%;
-  //         top: 0;
-  //         width: 80%;
-  //         box-sizing: border-box;
-  //         height: 100%;
-  //         .cd {
-  //           width: 100%;
-  //           height: 100%;
-  //           border-radius: 50%;
-  //           img {
-  //             position: absolute;
-  //             left: 0;
-  //             top: 0;
-  //             width: 100%;
-  //             height: 100%;
-  //             box-sizing: border-box;
-  //             border-radius: 50%;
-  //             border: 10px solid rgba(255, 255, 255, 0.1);
-  //           }
-  //           .playing {
-  //             animation: rotate 20s linear infinite
-  //           }
-  //         }
-  //       }
-  //       .playing-lyric-wrapper {
-  //         width: 80%;
-  //         margin: 30px auto 0 auto;
-  //         overflow: hidden;
-  //         text-align: center;
-  //         .playing-lyric {
-  //           height: 20px;
-  //           line-height: 20px;
-  //           font-size: $font-size-medium;
-  //           color: $color-text-l;
-  //         }
-  //       }
-  //     }
-  //     .middle-r {
-  //       display: inline-block;
-  //       vertical-align: top;
-  //       width: 100%;
-  //       height: 100%;
-  //       overflow: hidden;
-  //       .lyric-wrapper {
-  //         width: 80%;
-  //         margin: 0 auto;
-  //         overflow: hidden;
-  //         text-align: center;
-  //         .text {
-  //           line-height: 32px;
-  //           color: $color-text-l;
-  //           font-size: $font-size-medium;
-  //           &.current {
-  //             color: $color-text;
-  //           }
-  //         }
-  //         .pure-music {
-  //           padding-top: 50%;
-  //           line-height: 32px;
-  //           color: $color-text-l;
-  //           font-size: $font-size-medium;
-  //         }
-  //       }
-  //     }
-  //   }
+    .middle {
+      position: fixed;
+      width: 100%;
+      top: 80px;
+      bottom: 170px;
+      white-space: nowrap;
+      font-size: 0;
+      .middle-l {
+        // display: inline-block;
+        display: none;
+        vertical-align: top;
+        position: relative;
+        width: 100%;
+        height: 0;
+        padding-top: 80%;
+        .cd-wrapper {
+          position: absolute;
+          left: 10%;
+          top: 0;
+          width: 80%;
+          box-sizing: border-box;
+          height: 100%;
+          .cd {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            img {
+              position: absolute;
+              left: 0;
+              top: 0;
+              width: 100%;
+              height: 100%;
+              box-sizing: border-box;
+              border-radius: 50%;
+              border: 10px solid rgba(255, 255, 255, 0.1);
+            }
+            .playing {
+              animation: rotate 20s linear infinite
+            }
+          }
+        }
+        // .playing-lyric-wrapper {
+        //   width: 80%;
+        //   margin: 30px auto 0 auto;
+        //   overflow: hidden;
+        //   text-align: center;
+        //   .playing-lyric {
+        //     height: 20px;
+        //     line-height: 20px;
+        //     font-size: $font-size-medium;
+        //     color: $color-text-l;
+        //   }
+        // }
+      }
+      .middle-r {
+        display: inline-block;
+        vertical-align: top;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        .lyric-wrapper {
+          width: 80%;
+          margin: 0 auto;
+          overflow: hidden;
+          text-align: center;
+          .text {
+            line-height: 32px;
+            color: $color-text-l;
+            font-size: $font-size-medium;
+            &.current {
+              color: $color-text;
+            }
+          }
+          // .pure-music {
+          //   padding-top: 50%;
+          //   line-height: 32px;
+          //   color: $color-text-l;
+          //   font-size: $font-size-medium;
+          // }
+        }
+      }
+    }
     .bottom {
       position: absolute;
       bottom: 50px;

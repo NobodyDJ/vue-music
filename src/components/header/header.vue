@@ -26,7 +26,7 @@ export default {
       height: 32px;
       margin-right: 9px;
       // 引入mixin中指定的logo样式
-      @include bg-image('@/assets/images/logo');
+      @include bg-image('./logo');
       background-size: 30px 32px;
     }
     .text {

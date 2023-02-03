@@ -1,23 +1,28 @@
-const { defineConfig } = require('@vue/cli-service')
 const registerRouter = require('./backend/router')
-module.exports = defineConfig({
-  transpileDependencies: true,
-  // 全局配置sass文件 具体查看vue cli文档
+
+module.exports = {
   css: {
     loaderOptions: {
       sass: {
-        // 引入全局变量和mixin，因为这里两个文件都是css变量没有立即生效在全局上的样式。
+        // 全局引入变量和 mixin
         additionalData: `
-          @import '@/assets/scss/variable.scss';
-          @import '@/assets/scss/mixin.scss';
+          @import "@/assets/scss/variable.scss";
+          @import "@/assets/scss/mixin.scss";
         `
       }
     }
   },
-  // webpack的设置此处未知，启用了一个node服务
   devServer: {
-    onBeforeSetupMiddleware(app) {
-      registerRouter(app.app)
+    before(app) {
+      registerRouter(app)
     }
-  }
-})
+  },
+  configureWebpack: (config) => {
+    if (process.env.npm_config_report) {
+      const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+      config.plugins.push(new BundleAnalyzerPlugin())
+    }
+  },
+  productionSourceMap: false,
+  publicPath: process.env.NODE_ENV === 'production' ? '/music-next/' : '/'
+}

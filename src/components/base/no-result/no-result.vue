@@ -35,7 +35,7 @@
       width: 86px;
       height: 90px;
       margin: 0 auto;
-      @include bg-image('@/assets/images/no-result');
+      @include bg-image('./no-result');
       background-size: 86px 90px;
     }
     .text {
