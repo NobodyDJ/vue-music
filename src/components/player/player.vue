@@ -41,13 +41,16 @@
                   :src="currentSong.pic">
               </div>
             </div>
+            <div class="playing-lyric-wrapper">
+              <div class="playing-lyric">{{playingLyric}}</div>
+            </div>
           </div>
           <scroll
             class="middle-r"
             ref="lyricScrollRef"
           >
             <div class="lyric-wrapper">
-              <div v-if="currentLyric" ref="lyricListRef">
+              <div v-if="currentLyric && !pureMusicLyric" ref="lyricListRef">
                 <p
                   class="text"
                   :class="{'current': currentLineNum === index}"
@@ -56,6 +59,9 @@
                 >
                   {{line.txt}}
                 </p>
+              </div>
+              <div class="pure-music" v-else>
+                <p>{{ pureMusicLyric }}</p>
               </div>
             </div>
           </scroll>
@@ -112,11 +118,12 @@ import useMode from './use-mode'
 import useFavorite from './use-favorite'
 import useCd from './use-cd'
 import useLyric from './use-lyric'
+import _ from 'lodash'
 export default {
   name: 'player',
   components: { ProgressBar, Scroll },
   // 这里放得都是播放器的相关逻辑
-  setup(props) {
+  setup(props, context) {
     // 注意代码的分类规范
     // data
     const store = useStore()
@@ -129,7 +136,7 @@ export default {
     const { modeIcon, changeMode } = useMode()
     const { getFavoriteIcon, toggleFavorite } = useFavorite()
     const { cdRef, cdImageRef, cdCls } = useCd()
-    const { currentLyric, currentLineNum, lyricScrollRef, lyricListRef, playLyric, stopLyric } = useLyric(songReady, currentTime)
+    const { currentLyric, currentLineNum, pureMusicLyric, playingLyric, lyricScrollRef, lyricListRef, playLyric, stopLyric } = useLyric(songReady, currentTime)
     // computed
     const fullScreen = computed(() => { return store.state.fullScreen })
     const currentSong = computed(() => { return store.getters.currentSong })
@@ -147,10 +154,18 @@ export default {
       if (!newVal.id && !newVal.url) {
         return
       }
+      // 初始化防止歌词获取到上一首歌的歌词，异步导致的结果
+      // 情况未执行完的进程
+      stopLyric()
+      currentLyric.value = null
+      currentLineNum.value = 0
+      playingLyric.value = ''
+      pureMusicLyric.value = ''
       songReady.value = false
       const audioEl = audioRef.value
       audioEl.src = newVal.url
       audioEl.play()
+      store.commit('setPlayingState', true)
     })
     watch(playing, (newVal) => {
       // 当歌曲发生切换时，歌曲播放状态和当前歌曲发生变化的两个监听只能触发其中一个，不然就会重复播放
@@ -186,7 +201,7 @@ export default {
       audioEl.play()
       store.commit('setPlayingState', true)
     }
-    function prev() {
+    const prev = _.throttle(() => {
       let index = currentIndex.value - 1
       const list = playList.value
       // 对异常情况处理，代码逻辑基本上是一个小demo，然后对这个小demo进行异常处理
@@ -206,8 +221,8 @@ export default {
           store.commit('setPlayingState', true)
         }
       }
-    }
-    function next() {
+    }, 500)
+    const next = _.throttle(() => {
       let index = currentIndex.value + 1
       const list = playList.value
       if (!songReady.value && !list.length) {
@@ -224,7 +239,7 @@ export default {
           store.commit('setPlayingState', true)
         }
       }
-    }
+    }, 500)
     // 导致错误的原因是两个watch()都执行了audioEl.play()，导致资源被加载了两次
     // 当前歌曲可否正常播放下去，如果被莫名打断，用这个函数去阻止重新加载
     function ready() {
@@ -254,8 +269,9 @@ export default {
     function onProgressChanging(progress) {
       progressChanging = true
       currentTime.value = progress * currentSong.value.duration
-      stopLyric()
+      // 首先同步歌词的地方然后再暂停
       playLyric()
+      stopLyric()
     }
     function onProgressChanged(progress) {
       progressChanging = false
@@ -301,6 +317,8 @@ export default {
       // lyric
       currentLyric,
       currentLineNum,
+      playingLyric,
+      pureMusicLyric,
       lyricScrollRef,
       lyricListRef
     }
@@ -373,8 +391,7 @@ export default {
       white-space: nowrap;
       font-size: 0;
       .middle-l {
-        // display: inline-block;
-        display: none;
+        display: inline-block;
         vertical-align: top;
         position: relative;
         width: 100%;
@@ -406,18 +423,18 @@ export default {
             }
           }
         }
-        // .playing-lyric-wrapper {
-        //   width: 80%;
-        //   margin: 30px auto 0 auto;
-        //   overflow: hidden;
-        //   text-align: center;
-        //   .playing-lyric {
-        //     height: 20px;
-        //     line-height: 20px;
-        //     font-size: $font-size-medium;
-        //     color: $color-text-l;
-        //   }
-        // }
+        .playing-lyric-wrapper {
+          width: 80%;
+          margin: 30px auto 0 auto;
+          overflow: hidden;
+          text-align: center;
+          .playing-lyric {
+            height: 20px;
+            line-height: 20px;
+            font-size: $font-size-medium;
+            color: $color-text-l;
+          }
+        }
       }
       .middle-r {
         display: inline-block;
@@ -438,12 +455,12 @@ export default {
               color: $color-text;
             }
           }
-          // .pure-music {
-          //   padding-top: 50%;
-          //   line-height: 32px;
-          //   color: $color-text-l;
-          //   font-size: $font-size-medium;
-          // }
+          .pure-music {
+              padding-top: 50%;
+              line-height: 32px;
+              color: $color-text-l;
+              font-size: $font-size-medium;
+            }
         }
       }
     }

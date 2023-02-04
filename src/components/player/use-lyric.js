@@ -8,6 +8,8 @@ export default function useLyric(songReady, currentTime) {
     const currentLineNum = ref(0)
     const lyricScrollRef = ref(null)
     const lyricListRef = ref(null)
+    const pureMusicLyric = ref('')
+    const playingLyric = ref('')
     const currentSong = computed(() => { return store.getters.currentSong })
 
     watch(currentSong, async (newSong) => {
@@ -16,7 +18,7 @@ export default function useLyric(songReady, currentTime) {
             if (!newSong.url || !newSong.id) {
                 return
             }
-            // 对已经获取过的歌曲的歌词，进行缓存操作
+            // 对已经获取过的歌曲的歌词，进行缓存操作内部有，出现异步操作抢占执行顺序时，可以考虑把前者未执行完的过程，情况
             const lyric = await getLyric(newSong)
             // 注意 await后续的操作，是一个异步操作，必须await成功执行才会继续操作
             // 但是如果期间发生了歌曲切换，会导致歌词错乱，保证一一对应即可,vuex的数据与传入参数的song不一致
@@ -28,19 +30,24 @@ export default function useLyric(songReady, currentTime) {
                 return
             }
             currentLyric.value = new Lyric(lyric, handleLyric)
-            if (songReady.value) {
-                // 当歌曲准备完播放
-                playLyric(newSong)
+            const hasLyric = currentLyric.value.lines.length
+            if (hasLyric) {
+                if (songReady.value) {
+                    playLyric()
+                }
+            } else {
+                playingLyric.value = pureMusicLyric.value = lyric.replace(/\[(\d{2}):(\d{2}):(\d{2})\]/g, '')
             }
         } catch (error) {
             this.$message.error(error)
         }
     })
     // 对当前歌词进行操作
-    function handleLyric({ lineNum }) {
+    function handleLyric({ lineNum, txt }) {
         currentLineNum.value = lineNum
         const scrollComp = lyricScrollRef.value
         const listEL = lyricListRef.value
+        playingLyric.value = txt
         // 当歌词行超过第五行的时候，就自动滚动到那一行
         if (lineNum > 5) {
             // 默认一直滚动到第二位置，这样的中心的歌词位置相对就不会发生改变
@@ -69,6 +76,8 @@ export default function useLyric(songReady, currentTime) {
     return {
         currentLyric,
         currentLineNum,
+        pureMusicLyric,
+        playingLyric,
         lyricScrollRef,
         lyricListRef,
         playLyric,
