@@ -6,7 +6,9 @@
     <transition
       name="normal"
       @enter="onEnter"
-      @after-enter="onAfterEnter">
+      @after-enter="onAfterEnter"
+      @leave="onAfterEnter"
+      @after-leave="onAfterLeave">
       <div
         class="normal-player"
         v-show="fullScreen"

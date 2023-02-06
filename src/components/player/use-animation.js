@@ -3,8 +3,15 @@ import animations from 'create-keyframe-animation'
 
 export default function useAnimation() {
     const cdWrapperRef = ref(null)
+    // 动画节流的思想，确保每一个动画都已经顺利完成
+    let leaving = false
+    let entering = false
 
     function onEnter(el, done) {
+        if (leaving) {
+            onAfterLeave()
+        }
+        entering = true
         const { x, y, scale } = getPosAndScale()
         const animation = {
             0: {
@@ -25,17 +32,35 @@ export default function useAnimation() {
         animations.runAnimation(cdWrapperRef.value, 'move', done)
     }
     function onAfterEnter() {
+        entering = false
         animations.unregisterAnimation()
         cdWrapperRef.value.animation = ''
     }
-    function onLeave() {
-        console.log('111')
+    function onLeave(el, done) {
+        if (entering) {
+            onAfterEnter()
+        }
+        leaving = true
+        const { x, y, scale } = getPosAndScale()
+        const cdWrapperEl = cdWrapperRef.value
+
+        cdWrapperEl.style.transition = 'all .6s cubic-bezier(0.45, 0, 0.55, 1)'
+        cdWrapperEl.style.transform = `translate3d(${x}px, ${y}px, 0) scale(${scale})`
+        cdWrapperEl.addEventListener('transitionend', next)
+
+        function next() {
+            cdWrapperEl.removeEventListener('transitionend', next)
+            done()
+        }
     }
     function onAfterLeave() {
-        console.log('111')
+        leaving = false
+        const cdWrapperEl = cdWrapperRef.value
+
+        cdWrapperEl.style.transition = ''
+        cdWrapperEl.style.transform = ''
     }
     function getPosAndScale() {
-        // 感觉是大的CD变成小的CD
         const targetWidth = 40
         const paddingLeft = 40
         const paddingBottom = 30
