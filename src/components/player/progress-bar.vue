@@ -56,8 +56,8 @@ export default {
   },
   watch: {
     progress(newVal) {
-      const barWidth = this.$el.clientWidth - progressBtnWidth
-      this.offset = barWidth * newVal
+      // 这里会出现一个问题，如果切换到miniPlayer中，会导致无法获取DOM的元素的宽度，所以需要重新计算
+      this.setOffSetWidth(newVal)
     }
   },
   methods: {
@@ -91,6 +91,10 @@ export default {
       const progress = delta / barWidth
       // 注意这里讲progress进度返回给父组件 去计算当前歌曲的时间
       this.$emit('progress-changed', progress)
+    },
+    setOffSetWidth(progress) {
+      const barWidth = this.$el.clientWidth - progressBtnWidth
+      this.offset = barWidth * progress
     }
   }
 }

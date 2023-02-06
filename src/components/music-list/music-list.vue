@@ -162,6 +162,7 @@
       },
       selectSong({ song, index }) {
         this.selectPlay({
+          // 直接把歌手下面的所有歌曲放入播放列表
           list: this.songs,
           index
         })

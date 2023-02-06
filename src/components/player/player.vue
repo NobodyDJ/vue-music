@@ -125,7 +125,7 @@
 </template>
 
 <script>
-import { computed, watch, ref } from 'vue'
+import { computed, watch, ref, nextTick } from 'vue'
 import { useStore } from 'vuex'
 import { formatTime } from '@/assets/js/util'
 import { PLAY_MODE } from '@/assets/js/constant'
@@ -149,6 +149,7 @@ export default {
     const audioRef = ref(null)
     const songReady = ref(false)
     const currentTime = ref(0)
+    const barRef = ref(null)
     // 当进度条发生变化时，优先拖动改变事件大于播放器获取实时事件
     let progressChanging = false
     // hooks
@@ -201,6 +202,14 @@ export default {
       } else {
         audioEl.pause()
         stopLyric()
+      }
+    })
+    watch(fullScreen, async (newVal) => {
+      if (newVal) {
+        // 获取子组件下的方法
+        // 注意这里需要将DOM更新完毕后，在获取DOM元素进行实时更新
+        await nextTick()
+        barRef.value.setOffSetWidth(newVal)
       }
     })
     // methods
@@ -310,6 +319,7 @@ export default {
       audioRef,
       playIcon,
       disableCls,
+      barRef,
       goBack,
       togglePlay,
       pause,

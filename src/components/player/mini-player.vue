@@ -19,9 +19,17 @@
           >
         </div>
       </div>
-      <div class="slider-wrapper">
-        <h2 class="name">{{ currentSong.name }}</h2>
-        <p class="desc">{{ currentSong.singer }}</p>
+      <div class="slider-wrapper" ref="sliderWrapper">
+        <div class="slider-group">
+          <div
+            class="slider-page"
+            v-for="song in playList"
+            :key="song.id"
+          >
+            <h2 class="name">{{ song.name }}</h2>
+            <p class="desc">{{ song.singer }}</p>
+          </div>
+        </div>
       </div>
       <div class="control">
         <process-circle
@@ -40,44 +48,49 @@ import { useStore } from 'vuex'
 import { computed } from 'vue'
 import ProcessCircle from './process-circle.vue'
 import useCd from './use-cd'
+import useMiniSlider from './use-mini-slider'
 
 export default {
 name: 'mini-player',
 components: { ProcessCircle },
 props: {
     progress: {
-        type: Number,
-        default: 0
+      type: Number,
+      default: 0
     },
     togglePlay: Function
 },
-    setup() {
-        const store = useStore()
-        const fullScreen = computed(() => store.state.fullScreen)
-        const currentSong = computed(() => store.getters.currentSong)
-        const playing = computed(() => store.state.playing)
+  setup() {
+    const store = useStore()
+    const fullScreen = computed(() => store.state.fullScreen)
+    const currentSong = computed(() => store.getters.currentSong)
+    const playing = computed(() => store.state.playing)
+    const playList = computed(() => store.state.playList)
+    // hooks
+    const { cdCls, cdRef, cdImageRef } = useCd()
+    const { sliderWrapper } = useMiniSlider()
+    const miniPlayIcon = computed(() => {
+      return playing.value ? 'icon-pause-mini' : 'icon-play-mini'
+    })
 
-        const { cdCls, cdRef, cdImageRef } = useCd()
-        const miniPlayIcon = computed(() => {
-            return playing.value ? 'icon-pause-mini' : 'icon-play-mini'
-        })
-
-        function showNormalPlayer() {
-        store.commit('setFullScreen', true)
-        }
-
-        return {
-        fullScreen,
-        currentSong,
-        miniPlayIcon,
-        showNormalPlayer,
-        // cd
-        cdCls,
-        cdRef,
-        cdImageRef
-        // mini-slider
-        }
+    function showNormalPlayer() {
+      store.commit('setFullScreen', true)
     }
+
+    return {
+      fullScreen,
+      currentSong,
+      miniPlayIcon,
+      playList,
+      showNormalPlayer,
+      // cd
+      cdCls,
+      cdRef,
+      cdImageRef,
+      // mini-slider
+      sliderWrapper
+    }
+  }
 }
 </script>
 
@@ -144,7 +157,7 @@ props: {
     .control {
       flex: 0 0 30px;
       width: 30px;
-      padding: 0 10px;
+      padding: 0 11px;
       .icon-playlist {
         position: relative;
         top: -2px;
