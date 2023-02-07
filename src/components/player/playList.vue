@@ -2,15 +2,17 @@
   <teleport to="body">
     <transition name="list-fade">
       <div
-        class="playlist"
-        v-show="visible && playlist.length"
+        class="playList"
+        v-show="visible && playList.length"
+        @click="hide"
       >
-        <div class="list-wrapper">
+        <div class="list-wrapper" @click.stop>
           <div class="list-header">
             <h1 class="title">
               <i
                 class="icon"
                 :class="modeIcon"
+                @click="changeMode"
               >
               </i>
               <span class="text">{{ modeText }}</span>
@@ -39,7 +41,8 @@
               </li>
             </ul>
           </scroll>
-          <div class="list-footer">
+          <!-- 注意事件冒泡影响到上层DOM -->
+          <div class="list-footer" @click.stop="hide">
             <span>关闭</span>
           </div>
         </div>
@@ -49,34 +52,67 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue'
+import { ref, computed, nextTick } from 'vue'
 import { useStore } from 'vuex'
 import Scroll from '@/components/base/scroll/scroll'
 import useMode from './use-mode'
+import useFavorite from './use-favorite'
 export default {
-  name: 'playlist',
+  name: 'playList',
   components: {
     Scroll
   },
   setup() {
     const visible = ref(null)
     const store = useStore()
+    const scrollRef = ref(null)
     // computed
-    const playlist = computed(() => store.state.playlist)
+    const playList = computed(() => store.state.playList)
+    const currentSong = computed(() => store.getters.currentSong)
+    const sequenceList = computed(() => store.state.sequenceList)
     // hooks
-    const { modeIcon } = useMode()
+    const { modeIcon, modeText, changeMode } = useMode()
+    const { getFavoriteIcon, toggleFavorite } = useFavorite()
+    // function
+    function hide() {
+      visible.value = false
+    }
+    async function show() {
+      visible.value = true
+      await nextTick()
+      scrollRefresh()
+    }
+    // 获取播放图标
+    function getCurrentIcon(song) {
+      if (song.id === currentSong.value.id) {
+        return 'icon-play'
+      }
+    }
+    function scrollRefresh() {
+      scrollRef.value.scroll.refresh()
+    }
     return {
       visible,
-      playlist,
+      scrollRef,
+      playList,
+      sequenceList,
+      hide,
+      show,
+      getCurrentIcon,
       // useMode
-      modeIcon
+      modeIcon,
+      modeText,
+      changeMode,
+      // favorite
+      getFavoriteIcon,
+      toggleFavorite
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-  .playlist {
+  .playList {
     position: fixed;
     left: 0;
     right: 0;

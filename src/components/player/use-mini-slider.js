@@ -42,6 +42,8 @@ export default function useMiniSlider() {
                 } else {
                     sliderVal.refresh()
                 }
+                // 将滑块滑动指定的歌曲索引中
+                sliderVal.goToPage(currentIndex.value, 0, 0)
             }
         })
         watch(currentIndex, (newVal) => {
