@@ -5,7 +5,7 @@
       :title="title"
       :pic="pic"
       :loading="loading"
-      rank
+      :rank="true"
     ></music-list>
   </div>
 </template>

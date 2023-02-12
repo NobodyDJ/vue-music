@@ -93,6 +93,9 @@
         default: false
       }
     },
+    updated() {
+      this.$refs.scrollList.scroll.refresh()
+    },
     mounted() {
       this.imageHeight = this.$refs.bgImage.clientHeight
       this.maxTranslateY = this.imageHeight - REVERSED_HEIGHT
