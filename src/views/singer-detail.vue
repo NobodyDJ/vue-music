@@ -10,76 +10,13 @@
 </template>
 
 <script>
+// 这块业务逻辑歌手详情与专辑详情是一致的
+// 可以把以下的逻辑进行同一的封装
 import { getSingerDetail } from '@/service/singer'
-import { processSongs } from '@/service/song'
-import musicList from '@/components/music-list/music-list'
 import { SINGER_KEY } from '@/assets/js/constant'
+import createDetailComponent from '@/assets/js/create-detail-component'
 
-export default {
-    name: 'singer-detail',
-    props: {
-        singer: {
-            type: Object,
-            default: () => {}
-        }
-    },
-    data() {
-        return {
-            songs: [],
-            loading: true
-        }
-    },
-    components: {
-        musicList
-    },
-    watch: {
-        $route() {
-            if (this.$route.params.id) {
-                this.$nextTick(() => {
-                    this.getSongs()
-                })
-            }
-        }
-    },
-    computed: {
-        // 对已经选中的歌手已经缓存
-        computedSinger() {
-            const singer = this.singer
-            let result = null
-            if (Object.keys(singer).length !== 0) {
-                result = singer
-            } else {
-                const cachedSinger = JSON.parse(sessionStorage.getItem(SINGER_KEY))
-                if (cachedSinger && cachedSinger.mid === this.$route.params.id) {
-                    result = cachedSinger
-                }
-            }
-            return result
-        },
-        pic() {
-            return this.computedSinger && this.computedSinger.pic
-        },
-        title() {
-            return this.computedSinger && this.computedSinger.name
-        }
-    },
-    created() {
-        this.getSongs()
-    },
-    methods: {
-        async getSongs() {
-            const computedSinger = this.computedSinger
-            if (!computedSinger) {
-                const path = this.$route.matched[0].path
-                this.$router.push({ path })
-                return
-            }
-            const result = await getSingerDetail(computedSinger)
-            this.songs = await processSongs(result.songs)
-            this.loading = false
-        }
-    }
-}
+export default createDetailComponent('singer-detail', SINGER_KEY, getSingerDetail)
 </script>
 
 <style lang="scss" scoped>

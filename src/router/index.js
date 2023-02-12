@@ -6,6 +6,8 @@ import Singer from '@/views/singer'
 import TopList from '@/views/top-list'
 import Search from '@/views/search'
 import SingerDetail from '@/views/singer-detail'
+import Album from '@/views/album'
+import TopDetail from '@/views/top-detail'
 
 // 配置路由组件 注意引入组件首字母大写 随后遵守驼峰命名规则
 const routes = [
@@ -16,7 +18,13 @@ const routes = [
   },
   {
     path: '/recommend',
-    component: Recommend
+    component: Recommend,
+    children: [
+      {
+        path: ':id',
+        component: Album
+      }
+    ]
   },
   {
     path: '/singer',
@@ -30,7 +38,13 @@ const routes = [
   },
   {
     path: '/top-list',
-    component: TopList
+    component: TopList,
+    children: [
+      {
+        path: ':id',
+        component: TopDetail
+      }
+    ]
   },
   {
     path: '/search',

@@ -39,11 +39,13 @@
       v-no-result:[noResultText]="noResult"
       :probeType="3"
       @scroll="onScroll"
+      ref="scrollList"
     >
       <div class="song-list-wrapper">
         <song-list
           :songs="songs"
           @select="selectSong"
+          :rank="rank"
         ></song-list>
       </div>
     </scroll>
@@ -52,8 +54,8 @@
 
 <script>
   import SongList from '@/components/base/song-list/song-list'
-  import Scroll from '@/components/base/scroll/scroll'
-  import { mapActions } from 'vuex'
+  import Scroll from '@/components/wrapper-scroll/wrapper-scroll'
+  import { mapActions, mapState } from 'vuex'
   const REVERSED_HEIGHT = 40
 
   export default {
@@ -85,6 +87,10 @@
       noResultText: {
         type: String,
         default: '抱歉，没有找到可播放的歌曲'
+      },
+      rank: {
+        type: Boolean,
+        default: false
       }
     },
     mounted() {
@@ -127,8 +133,11 @@
         }
       },
       scrollStyle() {
+        // 解决小播放器阻挡了歌曲列表的问题
+        const bottom = this.playList.length ? '60px' : '0'
         return {
-          top: `${this.imageHeight}px`
+          top: `${this.imageHeight}px`,
+          bottom
         }
       },
       filterStyle() {
@@ -151,7 +160,8 @@
         return {
           display
         }
-      }
+      },
+      ...mapState(['playList'])
     },
     methods: {
       goBack() {

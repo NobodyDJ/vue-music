@@ -254,9 +254,6 @@ export default {
           index = list.length - 1
         }
         store.commit('setCurrentIndex', index)
-        if (!playing.value) {
-          store.commit('setPlayingState', true)
-        }
       }
     }, 500)
     const next = _.throttle(() => {
@@ -272,9 +269,6 @@ export default {
           index = 0
         }
         store.commit('setCurrentIndex', index)
-        if (!playing.value) {
-          store.commit('setPlayingState', true)
-        }
       }
     }, 500)
     // 导致错误的原因是两个watch()都执行了audioEl.play()，导致资源被加载了两次

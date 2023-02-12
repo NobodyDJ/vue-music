@@ -51,6 +51,14 @@ export default function useMiniSlider() {
                 sliderVal.goToPage(newVal, 0, 0, 0)
             }
         })
+        // 歌曲列表发生变化时，重新刷新滑块
+        watch(playList, async (newVal) => {
+            if (sliderVal && slider.value && newVal.length) {
+                // 保证DOM元素刷新后，在执行操作是个好习惯
+                await nextTick()
+                sliderVal.refresh()
+            }
+        })
     })
     onUnmounted(() => {
         if (slider.value) {

@@ -1,4 +1,5 @@
 <template>
+  <!-- teleport将该DOM元素插入到body节点上 -->
   <teleport to="body">
     <transition name="list-fade">
       <div
@@ -16,19 +17,25 @@
               >
               </i>
               <span class="text">{{ modeText }}</span>
+              <span class="clear" @click="showConfirm">
+                <i class="icon-clear"></i>
+              </span>
             </h1>
           </div>
           <scroll
             ref="scrollRef"
             class="list-content"
           >
-            <ul
+            <transition-group
+              ref="listRef"
+              name="list"
+              tag="ul"
             >
               <li
                 class="item"
                 v-for="song in sequenceList"
                 :key="song.id"
-                @click="selectItem(song)"
+                @click.stop="selectItem(song)"
               >
                 <i
                   class="current"
@@ -38,34 +45,53 @@
                 <span class="favorite" @click.stop="toggleFavorite(song)">
                   <i :class="getFavoriteIcon(song)"></i>
                 </span>
+                <!-- 在DOM元素上防止用户连续过多点击，导致出错 -->
+                <span
+                  class="delete"
+                  :class="{ 'disable': removing }"
+                  @click.stop="removeSong(song)"
+                >
+                  <i class="icon-delete"></i>
+                </span>
               </li>
-            </ul>
+            </transition-group>
           </scroll>
           <!-- 注意事件冒泡影响到上层DOM -->
           <div class="list-footer" @click.stop="hide">
             <span>关闭</span>
           </div>
         </div>
+        <confirm
+          ref="confirmRef"
+          text="是否清空播放列表"
+          confirmBtnText="清空"
+          @confirm="clearPlayList"
+        ></confirm>
       </div>
     </transition>
   </teleport>
 </template>
 
 <script>
-import { ref, computed, nextTick } from 'vue'
+import { ref, computed, nextTick, watch } from 'vue'
 import { useStore } from 'vuex'
 import Scroll from '@/components/base/scroll/scroll'
+import Confirm from '@/components/base/confirm/confirm.vue'
 import useMode from './use-mode'
 import useFavorite from './use-favorite'
 export default {
   name: 'playList',
   components: {
-    Scroll
+    Scroll,
+    Confirm
   },
   setup() {
     const visible = ref(null)
     const store = useStore()
     const scrollRef = ref(null)
+    const listRef = ref(null)
+    const confirmRef = ref(null)
+    const removing = ref(false)
     // computed
     const playList = computed(() => store.state.playList)
     const currentSong = computed(() => store.getters.currentSong)
@@ -73,6 +99,15 @@ export default {
     // hooks
     const { modeIcon, modeText, changeMode } = useMode()
     const { getFavoriteIcon, toggleFavorite } = useFavorite()
+    // watch
+    watch(currentSong, async (newSong) => {
+      // 保证删除的时候有歌曲
+      if (!visible.value || !newSong.id) {
+        return
+      }
+      await nextTick
+      scrollToCurrent()
+    })
     // function
     function hide() {
       visible.value = false
@@ -81,6 +116,7 @@ export default {
       visible.value = true
       await nextTick()
       scrollRefresh()
+      scrollToCurrent()
     }
     // 获取播放图标
     function getCurrentIcon(song) {
@@ -91,14 +127,66 @@ export default {
     function scrollRefresh() {
       scrollRef.value.scroll.refresh()
     }
+    // 选中歌曲自动滚动到对应的位置
+    function scrollToCurrent() {
+      const index = sequenceList.value.findIndex((song) => {
+        return song.id === currentSong.value.id
+      })
+      if (index < 0) {
+        return
+      }
+      const target = listRef.value.$el.children[index]
+      scrollRef.value.scroll.scrollToElement(target, 300)
+    }
+    // 播放选中的歌曲
+    function selectItem(song) {
+      const index = playList.value.findIndex((item) => {
+        return song.id === item.id
+      })
+      store.commit('setCurrentIndex', index)
+      store.commit('setPlayMode', true)
+    }
+    // 删除选中的歌曲
+    function removeSong(song) {
+      // 因为需要改变播放列表的歌曲和顺序
+      if (removing.value) {
+        return
+      }
+      removing.value = true
+      store.dispatch('removeSong', song)
+      // 这里的时长是根据动画时长来判断的
+      if (!playList.value.length) {
+        hide()
+      }
+      setTimeout(() => {
+        removing.value = false
+      }, 300)
+    }
+    // 展示清空列表对话框
+    function showConfirm() {
+      confirmRef.value.visible = true
+    }
+    // 清空播放列表
+    function clearPlayList() {
+      store.dispatch('clearSongList')
+      hide()
+    }
     return {
       visible,
       scrollRef,
+      removing,
+      listRef,
+      confirmRef,
       playList,
       sequenceList,
       hide,
       show,
       getCurrentIcon,
+      scrollToCurrent,
+      selectItem,
+      removeSong,
+      showConfirm,
+      clearPlayList,
       // useMode
       modeIcon,
       modeText,
@@ -184,6 +272,7 @@ export default {
             @include no-wrap();
             font-size: $font-size-medium;
             color: $color-text-d;
+            padding-top: 2px;
           }
           .favorite {
             @include extend-click();

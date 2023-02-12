@@ -4,7 +4,7 @@
     <router-view v-slot="{ Component }">
       <transition appear name="slide">
         <keep-alive>
-          <component :is="Component" :singer="selectedSinger" />
+          <component :is="Component" :data="selectedSinger" />
         </keep-alive>
       </transition>
     </router-view>
