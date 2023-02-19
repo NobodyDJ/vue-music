@@ -41,6 +41,7 @@ export default function createLoadingLikeDirective(comp) {
                 append(el)
             }
         },
+        // 详情参考自定义指令文档，binding各类参数
         updated(el, binding) {
             const title = binding.arg
             if (typeof title !== 'undefined') {

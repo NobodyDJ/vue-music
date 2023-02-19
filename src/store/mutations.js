@@ -29,6 +29,9 @@ const mutations = {
             }
             return item
         })
+    },
+    setSearchHistory(state, searchHistory) {
+        state.searchHistory = searchHistory
     }
 }
 export default mutations

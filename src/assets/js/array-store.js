@@ -43,3 +43,8 @@ export function load(key) {
     const list = JSON.parse(localStorage.getItem(key)) || []
     return list
 }
+// 清空所有数据
+export function clear(key) {
+    localStorage.clear(key)
+    return []
+}
