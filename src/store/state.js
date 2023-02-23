@@ -1,4 +1,4 @@
-import { PLAY_MODE, FAVORITE_KEY, SEARCH_KEY } from '@/assets/js/constant'
+import { PLAY_MODE, FAVORITE_KEY, SEARCH_KEY, PLAY_KEY } from '@/assets/js/constant'
 import { load } from '@/assets/js/array-store'
 
 // 原始数据
@@ -18,7 +18,9 @@ const state = {
     // 获取本地收藏列表
     favoriteList: load(FAVORITE_KEY),
     // 获取本地搜索历史
-    searchHistory: load(SEARCH_KEY)
+    searchHistory: load(SEARCH_KEY),
+    // 获取本地播放历史
+    playHistory: load(PLAY_KEY)
 }
 
 export default state

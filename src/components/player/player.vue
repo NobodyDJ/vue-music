@@ -119,7 +119,6 @@
       :progress="progress"
       :toggle-play="togglePlay"
     >
-
     </mini-player>
     <audio ref="audioRef"
      @pause="pause"
@@ -144,6 +143,7 @@ import useCd from './use-cd'
 import useLyric from './use-lyric'
 import useMiddleActive from './use-middle-active'
 import useAnimation from './use-animation'
+import usePlayHistory from './use-play-history'
 import _ from 'lodash'
 export default {
   name: 'player',
@@ -166,6 +166,7 @@ export default {
     const { currentLyric, currentLineNum, pureMusicLyric, playingLyric, lyricScrollRef, lyricListRef, playLyric, stopLyric } = useLyric(songReady, currentTime)
     const { currentShow, middleLStyle, middleRStyle, onMiddleTouchStart, onMiddleTouchMove, onMiddleTouchEnd } = useMiddleActive()
     const { cdWrapperRef, onEnter, onAfterEnter, onLeave, onAfterLeave } = useAnimation()
+    const { savePlay } = usePlayHistory()
     // computed
     const fullScreen = computed(() => { return store.state.fullScreen })
     const currentSong = computed(() => { return store.getters.currentSong })
@@ -279,6 +280,7 @@ export default {
       }
       songReady.value = true
       playLyric()
+      savePlay(currentSong.value)
     }
     function error() {
       songReady.value = true

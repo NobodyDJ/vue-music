@@ -17,34 +17,34 @@
 <script>
 import _ from 'lodash'
 export default {
-    name: 'search-input',
-    props: {
-        modelValue: String,
-        placeholder: {
-            type: String,
-            default: '搜索歌曲、歌手'
-        }
-    },
-    data() {
-        return {
-            query: this.modelValue
-        }
-    },
-    created() {
-        // 向父组件传递更改的数据，vue3中的v-model，去除空白格
-        // $watch第一个参数是属性的字符串
-        this.$watch('query', _.debounce((newQuery) => {
-            this.$emit('update:modelValue', newQuery.trim())
-        }, 300))
-        this.$watch('modelValue', (newVal) => {
-            this.query = newVal
-        })
-    },
-    methods: {
-        clearQuery() {
-            this.query = ''
-        }
+  name: 'search-input',
+  props: {
+    modelValue: String,
+    placeholder: {
+      type: String,
+      default: '搜索歌曲、歌手'
     }
+  },
+  data() {
+    return {
+      query: this.modelValue
+    }
+  },
+  created() {
+    // 向父组件传递更改的数据，vue3中的v-model，去除空白格
+    // $watch第一个参数是属性的字符串
+    this.$watch('query', _.debounce((newQuery) => {
+      this.$emit('update:modelValue', newQuery.trim())
+    }, 300))
+    this.$watch('modelValue', (newVal) => {
+      this.query = newVal
+    })
+  },
+  methods: {
+    clearQuery() {
+      this.query = ''
+    }
+  }
 }
 </script>
 

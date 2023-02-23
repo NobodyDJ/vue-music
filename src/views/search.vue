@@ -64,7 +64,7 @@
 import { useStore } from 'vuex'
 import SearchInput from '@/components/search/search-input.vue'
 import Suggest from '@/components/search/suggest.vue'
-import SearchList from '@/components/base/search/search-list.vue'
+import SearchList from '@/components/base/search-list/search-list.vue'
 import Scroll from '@/components/wrapper-scroll/wrapper-scroll'
 import Confirm from '@/components/base/confirm/confirm.vue'
 import { ref, computed, watch, nextTick } from 'vue'

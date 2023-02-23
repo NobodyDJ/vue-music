@@ -3,8 +3,11 @@
 // 插入数组
 function insertArray(arr, item, compare, maxLen) {
     const index = arr.findIndex(compare)
-    if (index > -1) {
+    if (index === 0 || index === -1) {
         return
+    }
+    if (index > 0) {
+        arr.splice(index, 1)
     }
     arr.unshift(item)
     if (maxLen && arr.length > maxLen) {
@@ -47,4 +50,8 @@ export function load(key) {
 export function clear(key) {
     localStorage.clear(key)
     return []
+}
+// 将数组保存至本地
+export function saveAll(songs, key) {
+    localStorage.setItem(key, JSON.stringify(songs))
 }

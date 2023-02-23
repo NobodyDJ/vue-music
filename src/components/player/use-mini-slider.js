@@ -1,5 +1,5 @@
 import { useStore } from 'vuex'
-import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted, nextTick, onActivated, onDeactivated } from 'vue'
 import BScroll from '@better-scroll/core'
 import Slide from '@better-scroll/slide'
 
@@ -47,13 +47,14 @@ export default function useMiniSlider() {
             }
         })
         watch(currentIndex, (newVal) => {
-            if (sliderVal) {
+            // 注意如果这里miniPlayer没有展示就不需要执行自动滑动到指定歌曲
+            if (sliderVal && showSlide.value) {
                 sliderVal.goToPage(newVal, 0, 0, 0)
             }
         })
         // 歌曲列表发生变化时，重新刷新滑块
         watch(playList, async (newVal) => {
-            if (sliderVal && slider.value && newVal.length) {
+            if (sliderVal && showSlide.value && newVal.length) {
                 // 保证DOM元素刷新后，在执行操作是个好习惯
                 await nextTick()
                 sliderVal.refresh()
@@ -64,6 +65,15 @@ export default function useMiniSlider() {
         if (slider.value) {
             slider.value.destroy()
         }
+    })
+
+    onActivated(() => {
+        slider.value.enable()
+        slider.value.refresh()
+    })
+
+    onDeactivated(() => {
+        slider.value.disable()
     })
     return {
         slider,
