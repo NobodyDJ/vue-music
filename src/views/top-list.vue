@@ -58,7 +58,7 @@
       const result = await getTopList()
       this.topList = result.topList
       this.loading = false
-  },
+    },
     methods: {
       selectItem(top) {
         this.selectedTop = top

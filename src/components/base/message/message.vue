@@ -10,32 +10,32 @@
 
 <script>
 export default {
-    name: 'message',
-    props: {
-            delay: {
-            type: Number,
-            default: 2000
-        }
-    },
-    data() {
-        return {
-            visible: false
-        }
-    },
-    methods: {
-        show() {
-            this.visible = true
-            // 设置定时器，需要及时将定时器清理，防止内存泄漏
-            clearTimeout(this.timer)
-            this.timer = setTimeout(() => {
-                this.hide()
-            }, this.delay)
-        },
-        hide() {
-            clearTimeout(this.timer)
-            this.visible = false
-        }
+  name: 'message',
+  props: {
+      delay: {
+      type: Number,
+      default: 2000
     }
+  },
+  data() {
+    return {
+      visible: false
+    }
+  },
+  methods: {
+    show() {
+      this.visible = true
+      // 设置定时器，需要及时将定时器清理，防止内存泄漏
+      clearTimeout(this.timer)
+      this.timer = setTimeout(() => {
+          this.hide()
+      }, this.delay)
+    },
+    hide() {
+      clearTimeout(this.timer)
+      this.visible = false
+    }
+  }
 }
 </script>
 

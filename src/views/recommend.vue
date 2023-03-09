@@ -2,12 +2,12 @@
   <!-- 这里运用到了一个动态指令的规则 -->
   <div class="recommend" v-loading:[loadingText]="loading">
     <!-- 注意betterScroll只对第一个子元素生效 -->
-    <scroll class="recommend-content">
+    <scroll ref="scrollRef" class="recommend-content">
       <div>
         <div class="slider-wrapper">
-        <div class="slider-content">
-          <slider v-if="sliders.length" :sliders="sliders"></slider>
-        </div>
+          <div class="slider-content">
+            <slider v-if="sliders.length" :sliders="sliders"></slider>
+          </div>
         </div>
         <div class="recommend-list">
           <h1 class="list-title" v-show="!loading">热门歌单推荐</h1>
@@ -63,6 +63,13 @@ export default {
   computed: {
     loading() {
       return !this.sliders.length && !this.albums.length
+    }
+  },
+  watch: {
+    async albums(val) {
+      this.$nextTick(() => {
+        this.$refs.scrollRef.scroll.refresh()
+      })
     }
   },
   // 生命周期函数也可以声明为一个异步函数
