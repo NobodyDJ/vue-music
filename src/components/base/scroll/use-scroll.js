@@ -6,33 +6,33 @@ import { onMounted, onUnmounted, ref, onActivated, onDeactivated } from 'vue'
 BScroll.use(ObserveDOM)
 
 export default function useScroll(wrapperRef, options, emit) {
-    const scroll = ref(null)
+  const scroll = ref(null)
 
-    onMounted(() => {
-        const scrollVal = scroll.value = new BScroll(wrapperRef.value, {
-            observeDOM: true,
-            ...options
-        })
-        if (options.probeType > 0) {
-            scrollVal.on('scroll', (pos) => {
-                emit('scroll', pos)
-            })
-        }
+  onMounted(() => {
+    const scrollVal = scroll.value = new BScroll(wrapperRef.value, {
+      observeDOM: true,
+      ...options
     })
-    onUnmounted(() => {
-        scroll.value.destroy()
-    })
-
-    // 提高性能组件不适用的时候禁用它
-    onActivated(() => {
-        scroll.value.enable()
-        scroll.value.refresh()
-    })
-
-    onDeactivated(() => {
-        scroll.value.disable()
-    })
-    return {
-        scroll
+    if (options.probeType > 0) {
+      scrollVal.on('scroll', (pos) => {
+        emit('scroll', pos)
+      })
     }
+  })
+  onUnmounted(() => {
+    scroll.value.destroy()
+  })
+
+  // 提高性能组件不适用的时候禁用它
+  onActivated(() => {
+    scroll.value.enable()
+    scroll.value.refresh()
+  })
+
+  onDeactivated(() => {
+    scroll.value.disable()
+  })
+  return {
+    scroll
+  }
 }

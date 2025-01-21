@@ -8,17 +8,18 @@
       <component :is="Component"/>
     </keep-alive>
   </router-view>
+  <!-- 允许同一个页面嵌套多个路由组件，这里就是一个用户中心 -->
   <router-view
-      :style="viewStyle"
-      name="user"
-      v-slot="{ Component }"
-    >
-      <transition appear name="slide">
-        <keep-alive>
-          <component :is="Component"/>
-        </keep-alive>
-      </transition>
-    </router-view>
+    :style="viewStyle"
+    name="user"
+    v-slot="{ Component }"
+  >
+    <transition appear name="slide">
+      <keep-alive>
+        <component :is="Component"/>
+      </keep-alive>
+    </transition>
+  </router-view>
  <!-- 一个全局的播放器 -->
   <player></player>
 </template>
