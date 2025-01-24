@@ -4,7 +4,7 @@ import { onMounted, onUnmounted, ref, onActivated, onDeactivated } from 'vue'
 
 // 当生效的scroll的DOM元素发生变化时，进行实时的刷新保证能够拖动
 BScroll.use(ObserveDOM)
-
+// 滚动位置
 export default function useScroll(wrapperRef, options, emit) {
   const scroll = ref(null)
 

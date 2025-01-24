@@ -1,6 +1,7 @@
 <template>
   <div class="singer" v-loading="!singers.length">
     <index-list :data="singers" :probeType="3" @select="selectSinger"></index-list>
+    <!-- 子路由嵌套 -->
     <router-view v-slot="{ Component }">
       <transition appear name="slide">
         <keep-alive>
